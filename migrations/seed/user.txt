@@ -1,0 +1,2 @@
+INSERT INTO "user" (first_name, last_name, email, phone, password, is_super_user, is_active, created_date)
+VALUES ('Anurag', 'Vishwakrma', 'anurag@gmail.com', '9876543210', 'password', TRUE, TRUE, CURRENT_TIMESTAMP);
