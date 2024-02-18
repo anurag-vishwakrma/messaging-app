@@ -1,5 +1,6 @@
 from flask_marshmallow import Marshmallow
 from models.user import User
+from models.message import Message
 from marshmallow import Schema, fields, validate, validates_schema, ValidationError, validates
 
 marsh = Marshmallow()
@@ -34,3 +35,9 @@ class UserUpdateSchema(marsh.SQLAlchemyAutoSchema):
             errors['contact_number'] = ['User with this Contact_no already exists.']
         if errors:
             raise ValidationError(errors)
+
+
+class MessageSchema(marsh.SQLAlchemyAutoSchema):
+    class Meta:
+        model = Message
+        include_fk = True

@@ -3,6 +3,7 @@ from extension import db
 from models.user import User
 from passlib.hash import sha256_crypt
 from serializers import UserSchema
+from decorators import public_endpoint
 
 user_bp = Blueprint('user', __name__, url_prefix='/api/user')
 
@@ -10,6 +11,7 @@ user_schema = UserSchema()
 
 
 @user_bp.route('/', methods=['POST'])
+@public_endpoint
 def create_user():
     try:
         data = user_schema.load(request.get_json())
@@ -24,12 +26,10 @@ def create_user():
             "status": "success",
             "data": user_schema.dump(user_data),
             "message": "User created successfully",
-            "code": 201,
         }), 201
 
     except Exception as e:
         return jsonify({
             "status": "error",
             "message": str(e),
-            "code": 400
         }), 400

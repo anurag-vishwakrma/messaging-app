@@ -7,6 +7,7 @@ from passlib.hash import sha256_crypt
 from marshmallow import ValidationError
 from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt_identity, get_jwt
 from datetime import datetime, timedelta, timezone
+from decorators import public_endpoint
 import logging
 from sqlalchemy import func
 
@@ -28,12 +29,10 @@ def handle_validation_error(e):
         'status': 'error',
         'data': [],
         'message': e.messages,
-        'code': 400
     }), 400
 
 
 @auth_bp.route('/auth/change-password', methods=['POST'])
-@jwt_required()
 def change_password():
     try:
         data = request.get_json()
@@ -52,21 +51,18 @@ def change_password():
                 "status": "success",
                 "data": [],
                 "message": "password updated successfully",
-                "code": 200
             }), 200
         else:
             return jsonify({
                 "status": "error",
                 "data": [],
                 "message": {"data": "Invalid Current Password"},
-                "code": 400
             }), 400
     except Exception as e:
         return jsonify({
             "status": "error",
             "data": [],
             "message": {"data": str(e)},
-            "code": 400
         }), 400
 
 
@@ -80,21 +76,18 @@ def get_logged_in_user():
                 "status": "success",
                 "data": user_schema.dump(user),
                 "message": "Fetched User data successfully",
-                "code": 200
             }), 200
         else:
             return jsonify({
                 "status": "error",
                 "data": [],
                 "message": {"data": "User not found"},
-                "code": 400
             }), 400
     except Exception as e:
         return jsonify({
             "status": "error",
             "data": [],
             "message": {"data": str(e)},
-            "code": 400
         }), 400
 
 
@@ -120,13 +113,11 @@ def update_logged_in_user():
                 "status": "success",
                 "data": user_schema.dump(user),
                 "message": "User updated successfully",
-                "code": 200
             }), 200
         return jsonify({
             "status": "error",
             "data": [],
             "message": {"data": "User not found"},
-            "code": 404,
         }), 404
     except ValidationError as e:
         raise e
@@ -135,7 +126,6 @@ def update_logged_in_user():
             "status": "error",
             "data": [],
             "message": {"data": str(e)},
-            "code": 400
         }), 400
 
 
@@ -154,18 +144,17 @@ def refresh_access_token():
             # "access_token": token,
             "data": data,
             "message": "Token generated successfully",
-            "code": 200
         }), 200
     except Exception as e:
         return jsonify({
             "status": "error",
             "data": [],
             "message": {"data": str(e)},
-            "code": 400
         }), 400
 
 
 @auth_bp.route('/login', methods=['POST'])
+@public_endpoint
 def login():
     if request.method == 'POST':
         data = request.get_json()
@@ -178,7 +167,6 @@ def login():
                 "status": "error",
                 "data": [],
                 "message": {"data": "Invalid Username/Password"},
-                "code": 400
             }), 400
         elif user and sha256_crypt.verify(password, user.password):
             token = create_access_token(identity=user.id, expires_delta=timedelta(days=1))
@@ -193,21 +181,18 @@ def login():
                 # "access_token": token,
                 "data": data,
                 "message": "User Logged in Successfully",
-                "code": 200
             }), 200
         else:
             return jsonify({
                 "status": "error",
                 "data": [],
                 "message": {"data": "Invalid Username/Password"},
-                "code": 400
             }), 400
     else:
         return jsonify({
             "status": "error",
             "data": [],
             "message": {"data": "Invalid Request"},
-            "code": 400
         }), 400
 
 
