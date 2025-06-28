@@ -4,7 +4,7 @@ from sqlmodel import SQLModel
 from database import engine
 from api import user, message
 import uvicorn
-from .models import User, Message
+from app.models import User, Message
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):

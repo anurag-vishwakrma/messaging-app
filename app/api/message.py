@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session
-from ..crud import message as crud
-from ..schemas import message as schemas
-from .. import  database
+from app.crud import message as crud
+from app.schemas import message as schemas
+from app import database
 
 from fastapi import APIRouter, Depends
 from sqlmodel import Session

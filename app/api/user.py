@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends
 from sqlmodel import Session
-from .database import get_session
-from .crud import message as crud
-from .schemas import user as schemas
-from . import  database
+from app.database import get_session
+from app.crud import message as crud
+from app.schemas import user as schemas
+from app import  database
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
