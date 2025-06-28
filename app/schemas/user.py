@@ -1,13 +1,13 @@
-from pydantic import BaseModel
+from sqlmodel import SQLModel
+from typing import Optional
+from datetime import datetime
 
-class UserCreate(BaseModel):
+# User
+class UserCreate(SQLModel):
     username: str
-    password: str
+    email: str
 
-class UserLogin(BaseModel):
+class UserRead(SQLModel):
+    id: int
     username: str
-    password: str
-
-class Token(BaseModel):
-    access_token: str
-    token_type: str
+    email: str
