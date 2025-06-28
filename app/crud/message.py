@@ -2,10 +2,14 @@ from sqlmodel import Session, select
 from ..models import User, Message
 from ..schemas.message import MessageCreate
 from ..schemas.user import UserCreate
+from app.utils.token import hash_password
 
 # Users
 def create_user(session: Session, user: UserCreate):
-    db_user = User(**user.dict())
+    hashed_pw = hash_password(user.password)
+    user_data = user.dict()
+    user_data["password"] = hashed_pw  # Replace plaintext with hashed
+    db_user = User(**user_data)
     session.add(db_user)
     session.commit()
     session.refresh(db_user)
