@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from fastapi.responses import HTMLResponse
 from contextlib import asynccontextmanager
 from sqlmodel import SQLModel
@@ -6,6 +6,9 @@ from app.database import engine
 from app.api import user, message ,auth
 from fastapi.staticfiles import StaticFiles
 from app.models import User, Message  # ensures models are loaded for Alembic
+from app.utils.token import verify_token
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+security = HTTPBearer()
 import uvicorn
 import os
 @asynccontextmanager
@@ -17,8 +20,14 @@ app = FastAPI(
     title="Messaging App API",
     description="A backend service built with FastAPI, SQLModel, Alembic, and PostgreSQL.",
     version="1.0.0",
-    lifespan=lifespan
+    lifespan=lifespan,
+    dependencies=[Depends(verify_token)]
 )
+
+@app.get("/protected")
+def protected_route(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    token = credentials.credentials
+    return {"message": "Token received", "token": token}
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 STATIC_DIR = os.path.join(BASE_DIR, "static")
