@@ -8,9 +8,14 @@ from fastapi.staticfiles import StaticFiles
 from app.models import User, Message  # ensures models are loaded for Alembic
 from app.utils.token import verify_token
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi.middleware.cors import CORSMiddleware
+
+
 security = HTTPBearer()
 import uvicorn
 import os
+from app.utils.token import public
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     SQLModel.metadata.create_all(engine)
@@ -24,6 +29,14 @@ app = FastAPI(
     dependencies=[Depends(verify_token)]
 )
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],  # or ["*"] for dev
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 @app.get("/protected")
 def protected_route(credentials: HTTPAuthorizationCredentials = Depends(security)):
     token = credentials.credentials
@@ -32,7 +45,8 @@ def protected_route(credentials: HTTPAuthorizationCredentials = Depends(security
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 STATIC_DIR = os.path.join(BASE_DIR, "static")
 
-@app.get("/", response_class=HTMLResponse)
+@public
+@app.get("/", response_class=HTMLResponse, include_in_schema=False)
 def root():
     with open(f"{STATIC_DIR}/intro.html", "r", encoding="utf-8") as f:
         return HTMLResponse(content=f.read())
