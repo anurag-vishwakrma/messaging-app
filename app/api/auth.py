@@ -15,5 +15,5 @@ def login(login_data: UserLogin, session: Session = Depends(get_session)):
     if not user or not verify_password(login_data.password, user.password):
         raise HTTPException(status_code=401, detail="Invalid email or password")
 
-    access_token = create_access_token(data={"sub": user.email})
+    access_token = create_access_token(data={"sub": user.email, "user_id":user.id})
     return {"access_token": access_token, "token_type": "bearer"}
