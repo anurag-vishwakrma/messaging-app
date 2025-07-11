@@ -13,3 +13,6 @@ class User(SQLModel, table=True):
     is_super_user: bool = Field(default=False)
     is_active: bool = Field(default=True)
     created_date: Optional[datetime] = Field(default_factory=datetime.utcnow)
+
+    sid: Optional[str] = Field(default=None, max_length=128, nullable=True)
+    connected_at: Optional[datetime] = Field(default=None, nullable=True)

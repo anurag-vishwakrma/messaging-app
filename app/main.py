@@ -1,3 +1,6 @@
+import socketio
+from socketio import ASGIApp
+from app.sockets.events import register_socketio_events
 from fastapi import FastAPI, Depends
 from fastapi.responses import HTMLResponse
 from contextlib import asynccontextmanager
@@ -21,6 +24,8 @@ async def lifespan(app: FastAPI):
     SQLModel.metadata.create_all(engine)
     yield
 
+sio = socketio.AsyncServer(async_mode="asgi", cors_allowed_origins="*")
+
 app = FastAPI(
     title="Messaging App API",
     description="A backend service built with FastAPI, SQLModel, Alembic, and PostgreSQL.",
@@ -28,6 +33,10 @@ app = FastAPI(
     lifespan=lifespan,
     dependencies=[Depends(verify_token)]
 )
+# Register Socket.IO events
+register_socketio_events(sio)
+
+
 
 app.add_middleware(
     CORSMiddleware,
@@ -56,5 +65,8 @@ app.include_router(user.router)
 app.include_router(message.router)
 app.include_router(auth.router)
 
+# Mount ASGI app
+asgi_app = ASGIApp(sio, other_asgi_app=app)
+
 if __name__ == "__main__":
-    uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("app.main:asgi_app", host="0.0.0.0", port=8000, reload=True)
