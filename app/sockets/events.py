@@ -31,8 +31,7 @@ def register_socketio_events(sio: AsyncServer):
             await sio.disconnect(sid)
             return
 
-        # user_id = user_data["user_id"]
-        user_id = 1
+        user_id = user_data["user_id"]
 
         async for session in get_session():
             connected = ConnectedUser(user_id=user_id, sid=sid, connected_at=datetime.utcnow())
